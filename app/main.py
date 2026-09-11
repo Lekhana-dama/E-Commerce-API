@@ -1,4 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from app.dependencies.database import get_db
+from app.database.database import Base,engine
+from app.models import user,product,order_items,order,cart,cart_item,category
+from app.routers.auth import router as auth_router
+from app.routers.category import router as category_router
+from app.routers.product_router import router as product_router
+from app.routers.cart import router as cart_router
+
+Base.metadata.create_all(bind=engine)
 
 
 app=FastAPI(
@@ -6,7 +16,15 @@ app=FastAPI(
     description="Production-style E-Commerce Backend API",
     version="1.0.0",
 )
+app.include_router(auth_router)
+app.include_router(category_router)
+app.include_router(product_router)
+app.include_router(cart_router)
 
 @app.get("/")
 def root():
     return {"message":"E-comerce api is running"}
+
+@app.get("/db-test")
+def db_test(db:Session=Depends(get_db)):
+    return {"message":"Database session is working"}
