@@ -35,7 +35,7 @@ class Order(Base):
     )
 
     total_amount = Column(
-        Numeric(10, 2),
+        Numeric(12, 2),
         nullable=False
     )
 
