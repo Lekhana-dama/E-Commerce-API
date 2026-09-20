@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-
 from app.models.order import Order
 from app.models.order_items import OrderItem
+from app.models.cart_item import CartItem
 
 
 class OrderRepository:
@@ -22,7 +22,10 @@ class OrderRepository:
         )
 
         db.add(order)
-        db.commit()
+
+        # Save temporarily without committing
+        db.flush()
+
         db.refresh(order)
 
         return order
@@ -47,12 +50,13 @@ class OrderRepository:
         )
 
         db.add(order_item)
-        db.commit()
+
+        # Save temporarily without committing
+        db.flush()
+
         db.refresh(order_item)
 
         return order_item
-
-   
 
     @staticmethod
     def get_by_id(db: Session, order_id: int):
@@ -73,10 +77,15 @@ class OrderRepository:
         ).all()
 
     @staticmethod
-    def update_status(db: Session, order: Order, status: str):
+    def update_status(
+        db: Session,
+        order: Order,
+        status: str
+    ):
         order.status = status
 
         db.commit()
         db.refresh(order)
 
         return order
+    

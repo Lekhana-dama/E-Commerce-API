@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter,Depends,HTTPException
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from app.dependencies.auth import get_current_user
@@ -11,18 +11,31 @@ router=APIRouter(prefix="/auth",tags=["Authentication"])
 
 @router.post("/register",response_model=UserResponse)
 def register(user_data:UserCreate,db:Session=Depends(get_db)):
-    return UserService.register_user(db,user_data)
+    try:
+        return UserService.register_user(db,user_data)
+    except ValueError as e:
+        raise HTTPException (
+            status_code=400,
+            detail= str(e)
+        )
 
 @router.post("/login")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    return UserService.login_user(
-        db,
-        form_data.username,
-        form_data.password
-    )
+    try:
+        return UserService.login_user(
+            db,
+            form_data.username,
+            form_data.password
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=401,
+            detail=str(e)
+        )
+
 
 @router.get("/me",response_model=UserResponse)
 def get_profile(current_user=Depends(get_current_user)):

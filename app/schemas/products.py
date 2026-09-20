@@ -18,5 +18,13 @@ class ProductResponse(BaseModel):
     category_id:int
     image_url:str|None   
     is_active:bool
+
 class Config:
     from_attributes=True
+
+
+class ProductListResponse(BaseModel):
+    total: int
+    page: int
+    limit: int
+    products: list[ProductResponse]

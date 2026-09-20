@@ -41,7 +41,7 @@ class CartRepository:
     @staticmethod
     def delete_item(db:Session,cart_item:CartItem):
         db.delete(cart_item)
-        db.commit()
+        
 
 
 
