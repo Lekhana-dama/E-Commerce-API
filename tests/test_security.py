@@ -102,3 +102,25 @@ def test_access_protected_endpoint_with_invalid_token(client):
     )
 
     assert response.status_code == 401
+
+import uuid
+
+
+def test_password_hash_not_exposed(client):
+    email = f"safe_{uuid.uuid4().hex[:8]}@test.com"
+
+    response = client.post(
+        "/auth/register",
+        json={
+            "name": "Security User",
+            "email": email,
+            "password": "Safe@12345"
+        }
+    )
+
+    assert response.status_code in [200, 201]
+
+    data = response.json()
+
+    assert "password" not in data
+    assert "password_hash" not in data

@@ -113,7 +113,33 @@ class OrderService:
 
             # Send the error to the caller
             raise
-        @staticmethod
-        def get_user_order(db:Session,user_id:int):
+    @staticmethod
+    def get_user_order(db:Session,user_id:int):
                         order=OrderRepository.get_by_user(db,user_id)
                         return order
+    @staticmethod
+    def cancel_order(
+    db: Session,
+    user_id: int,
+    order_id: int
+):
+        order = OrderRepository.get_by_id(
+            db,
+            order_id
+        )
+
+        if not order:
+            raise ValueError("Order not found")
+
+        if order.user_id != user_id:
+            raise ValueError("You cannot cancel this order")
+
+        if order.status != "PENDING":
+            raise ValueError("Only pending orders can be cancelled")
+
+        order.status = "CANCELLED"
+
+        db.commit()
+        db.refresh(order)
+
+        return order
